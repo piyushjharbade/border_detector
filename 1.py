@@ -1,6 +1,5 @@
 import cv2 as cv
 import numpy as np
-import matplotlib.pyplot as plt
 from rembg import remove
 
 font = cv.FONT_HERSHEY_COMPLEX
@@ -9,89 +8,83 @@ def show(name):
     cv.waitKey()
     cv.destroyAllWindows()
 
-#choice=input(print("Do you want to continue? Yes/No (press 'q' for No)"))
-choice='Yes'
+choice=input(print("Do you want to continue? Yes/No (press 'q' for No)"))
 if (choice=='Yes'):
-        img= cv.imread('./1.webp')
-        img_resize=cv.resize(img,(1000,700))
 
-        crop=cv.selectROI("Draw a rectangle over an object inside the image", img_resize)
-        img_crop=img_resize[int(crop[1]): int(crop[1]+crop[3]), int(crop[0]):int(crop[0]+crop[2])]
-        img_rgb2=cv.cvtColor(img_crop, cv.COLOR_BGR2RGB)
-        show(img_rgb2)
+        img1= cv.imread('./1.webp')
+        img_resize1=cv.resize(img1,(1000,700))
 
-        cv.imwrite('img3.jpg', img_rgb2)
+        crop = cv.selectROI("Draw a rectangle over an object inside the image", img_resize1)
+        print('Selected bounding boxes: {}'.format(crop))
+        n=(crop[0], crop[2])
+        print(n)
 
-        with open('./img3.jpg', 'rb') as i:
-            with open('./img4.jpg', 'wb') as o:
+        img_crop = img_resize1[int(crop[1]): int(crop[1] + crop[3]), int(crop[0]):int(crop[0] + crop[2])]
+        show("Select an area to crop the image",img_crop)
+        cv.imwrite('img1.jpg', img_crop)
+
+        with open('./img1.jpg', 'rb') as i:
+            with open('./img2.jpg', 'wb') as o:
                 input = i.read()
                 output = remove(input)
                 o.write(output)
-
-        output=cv.imread('./img4.jpg')
-        img_rgb3=cv.cvtColor(output, cv.COLOR_BGR2RGB)
-        show(img_rgb3)
-
-        blank = np.zeros(img_rgb3.shape, dtype='uint8')
-        cv.imshow('Blank', blank)
-
-        gray = cv.cvtColor(img_rgb3, cv.COLOR_BGR2GRAY)
-        show(gray)
-        blur = cv.blur(gray, (10,10))
-        show(blur)
+        output=cv.imread('./img2.jpg')
+        show("Cropped Image",output)
 
 
+        blank = np.zeros(img_resize1.shape, dtype='uint8')
+
+        gray = cv.cvtColor(output, cv.COLOR_BGR2GRAY)
+        blur = cv.blur(gray, (10, 10))
         ret, thresh = cv.threshold(blur, 1, 255, cv.THRESH_OTSU)
-        show(thresh)
+
         contours, heirarchy = cv.findContours(thresh, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
-        print(f'Number of countours: {len(contours)}')
-        cv.drawContours(blank, contours=contours, contourIdx=-1, color=(0, 255, 255), thickness=2)
 
+        #cv.drawContours(img_resize1,contours, contourIdx=-1, color=(255, 0, 0), thickness=1)
+        #show(img_resize1)
+        print("contour(0,0)", contours[0][0])
+        contours[0][0]=contours[0][0]+crop[0]
+        print("contour(0,0)",contours[0][0])
+        contours[0][1]=contours[0][1]+crop[2]
 
-
-        for i, c in enumerate(contours):
-                mask = np.zeros(thresh.shape, np.uint8)
-                cv.drawContours(mask, [c], 0, (0, 255, 0), 3)
-                mean, _, _, _ = cv.mean(thresh, mask=mask)
-                cv.drawContours(img_rgb3, [c], 0, (255, 0, 0), 3)
-
-        # Going through every contours found in the image.
+        img_1=img_crop.copy()
         for cnt in contours:
 
             approx = cv.approxPolyDP(cnt, 0.009 * cv.arcLength(cnt, True), True)
 
-            # draws boundary of contours.
-            cv.drawContours(img_rgb3, [approx], 0, (0, 0, 255), 5)
-
-            # Used to flatted the array containing
-            # the co-ordinates of the vertices.
+            cv.drawContours(img_1, [approx], -1, (255, 0, 0), 1)
             n = approx.ravel()
             i = 0
-
             for j in n:
                 if (i % 2 == 0):
-                    x = n[i]
-                    y = n[i + 1]
 
-                    # String containing the co-ordinates.
-                    string = str(x) + " " + str(y)
-
-                    if (i == 0):
-                        # text on topmost co-ordinate.
-                        cv.putText(img_rgb3, "tip", (x, y),font,
-                                    0.5, (255, 0, 0))
-                    else:
-                        # text on remaining co-ordinates.
-                        cv.putText(img_rgb3, string, (x, y),font,
-                                     0.5, (0, 255, 0))
+                            x = n[i]
+                            y = n[i + 1]
+                            string = str(x) + " " + str(y)
+                            #if (i == 0):
+                             #   cv.putText(blank, "tip", (x+crop[0], y+crop[2]),font,
+                              #              0.5, (0, 255, 0),1)
+                            #else:
+                            cv.putText(img_1, string, (x+crop[0], y+crop[2]),font,0.5, (0, 255, 0),1)
                 i = i + 1
+        show(img_1)
+        cv.imwrite('img77.jpg', img_1)
+        above = cv.imread('./img77.jpg')
+        below = cv.imread('./1.webp')
+        x_offset = crop[0]
+        y_offset = crop[1]
+        img_resize1[y_offset:y_offset + img_1.shape[0], x_offset:x_offset + img_1.shape[1]] = img_1
+        #added_image = cv.add(below, above)
+        show(img_resize1)
 
-        # Showing the final image.
-
-        show(blank)
+        #c=input("")
+        #if(c=='c'):
+         #   show(img_resize1)
 
 if (choice == 'q'):
     print()
+
+
 
 
 
