@@ -9,7 +9,7 @@ def show(name):
 
 while True:
 
-        img1= cv.imread('./1.webp')
+        img1= cv.imread('./2.jpg')
         img_resize1=cv.resize(img1,(1000,700))
 
         crop = cv.selectROI("Draw a rectangle over an object inside the image", img_resize1)
