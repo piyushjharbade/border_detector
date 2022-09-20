@@ -25,8 +25,8 @@ if (choice=='Yes'):
 
         with open('./img1.jpg', 'rb') as i:
             with open('./img2.jpg', 'wb') as o:
-                input = i.read()
-                output = remove(input)
+                inp = i.read()
+                output = remove(inp)
                 o.write(output)
         output=cv.imread('./img2.jpg')
         show("Cropped Image",output)

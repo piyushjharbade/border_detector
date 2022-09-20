@@ -7,8 +7,7 @@ def show(name):
     cv.waitKey()
     cv.destroyAllWindows()
 
-choice=input(print("Do you want to continue? Yes/No (press 'q' for No)"))
-if (choice=='Yes'):
+while True:
 
         img1= cv.imread('./1.webp')
         img_resize1=cv.resize(img1,(1000,700))
@@ -20,8 +19,8 @@ if (choice=='Yes'):
 
         with open('./img1.jpg', 'rb') as i:
             with open('./img2.jpg', 'wb') as o:
-                input = i.read()
-                output = remove(input)
+                inp = i.read()
+                output = remove(inp)
                 o.write(output)
         output=cv.imread('./img2.jpg')
         show(output)
@@ -34,7 +33,7 @@ if (choice=='Yes'):
         img_1=img_crop.copy()
         for cnt in contours:
             approx = cv.approxPolyDP(cnt, 0 * cv.arcLength(cnt, True), True)
-            cv.drawContours(img_1, [approx], -1, (255, 0, 0), 1)
+            cv.drawContours(img_1, [approx], -1, (255, 0, 0), 2)
             n = approx.ravel()
             i = 0
             for j in n:
@@ -51,12 +50,12 @@ if (choice=='Yes'):
         y_offset = crop[1]
         img_resize1[y_offset:y_offset + img_1.shape[0], x_offset:x_offset + img_1.shape[1]] = img_1
         show(img_resize1)
+        print()
 
-        #c=input("")
-        #if(c=='c'):
-        #   show(img_resize1)
+        x=input("Enter 'q' to exit OR 'y' to continue: ")
+        if(x == "q"):
+           break
 
-if (choice == 'q'):
-    print()
+
 
 
